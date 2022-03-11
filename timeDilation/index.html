@@ -1,0 +1,103 @@
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.4.1/lib/p5.js"></script>
+    <!--<script src="https://unpkg.com/p5.createloop@0.2.8/dist/p5.createloop.js"></script>-->
+    <script src="https://unpkg.com/ccapture.js@1.1.0/build/CCapture.all.min.js"></script>
+</head>
+<body>
+    <main>
+    </main>
+</body>
+<script>
+    "use strict";
+
+    class Clock {
+        x;
+        y;
+        radius = 50;
+        speed;
+        color = 'red';
+        constructor(x, y, speed, color) {
+            this.speed = speed;
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.fill = true;
+            this.change = 1 / (2 * speed);
+        }
+        setPosition(x, y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        drawClock() {
+            this.theta = 2 * (frameCount / fc) * TWO_PI * this.speed;
+            strokeWeight(2);
+
+            fill('white');
+            stroke(this.color);
+            circle(this.x, this.y, this.radius);
+            fill(this.color);
+            if (this.theta / PI % 2 == 0) {
+                this.fill = !this.fill
+            }
+            if (this.fill) {
+                arc(this.x, this.y, this.radius, this.radius, -HALF_PI, this.theta - HALF_PI, PIE)
+            } else {
+                arc(this.x, this.y, this.radius, this.radius, this.theta - HALF_PI, -HALF_PI, PIE)
+            }
+        }
+    }
+
+    let c1, c2;
+    let t = 4;
+    let fr = 25;
+    let fc = t * fr;
+    let capturer = new CCapture({ format: 'png', framerate: fr });
+
+    function setup() {
+        pixelDensity(1);
+        createCanvas(600, 600)
+        fill(0)
+        frameRate(fr)
+
+        c1 = new Clock(0, 0, 2, color('red'));
+        c2 = new Clock(0, 0, 1, color('blue'));
+    }
+
+    function draw() {
+        if (frameCount === 1) {
+            // start the recording on the first frame
+            // this avoids the code freeze which occurs if capturer.start is called
+            // in the setup, since v0.9 of p5.js
+            capturer.start();
+        }
+
+        background(255);
+        translate(width / 2, height / 2);
+        const radiusX = height / 3;
+        const radiusY = height / 6;
+        noFill()
+        strokeWeight(1)
+        stroke(128)
+        ellipse(0, 0, radiusX * 2, radiusY * 2);
+        let rtheta = (frameCount / fc) * TWO_PI;
+        const x = cos(rtheta - HALF_PI) * radiusX
+        const y = sin(rtheta - HALF_PI) * radiusY
+        c2.setPosition(x, y);
+        c1.drawClock();
+        c2.drawClock();
+
+        console.log(frameCount, c1.theta / PI + "PI", c1.fill, c2.theta / PI + "PI", c2.fill);
+        capturer.capture(document.getElementById('defaultCanvas0'));
+        if (frameCount > fc) {
+            noLoop();
+            console.log('finished recording.');
+            capturer.stop();
+            capturer.save();
+            return;
+        }
+
+    }
+</script>
+</html>
