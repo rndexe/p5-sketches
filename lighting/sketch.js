@@ -1,31 +1,62 @@
-let capturer = new CCapture({ name: 'output', format: 'png' });
-let cam;
-function preload() {
-}
+let gui;
+var boxSize = 100;
+var Key_Hue = 0;
+var Key_HueMax = 360;
+var Key_Saturation = 100;
+var Key_Brightness = 100;
+var Fill_Hue = 120;
+var Fill_HueMax = 360;
+var Fill_Saturation = 100;
+var Fill_Brightness = 50;
+var boxX = 100;
+var boxZ = 0;
+var Key_Z = 250;
+var Key_ZMax = 500;
+var Key_Y = 250;
+var Key_YMax = 500;
+var Fill_X = 250;
+var Fill_XMax = 500;
+var Fill_Y = 250;
+var Fill_YMax = 500;
 
 function setup() {
-    createCanvas(900, 900, WEBGL);
-    ortho(-width / 2, width / 2, height / 2, -height / 2, 0, 900);
-    cam = createCamera();
-    cam.setPosition(400,-200,400);
-    cam.lookAt(0,0,0);
+
+    setAttributes('antialias', true);
+    createCanvas(1600, 900, WEBGL);
+    gui = createGui('Lighting');
+
+    gui.addGlobals('Key_Y', 'Key_Z',
+        'Key_Hue', 'Key_Saturation', 'Key_Brightness',
+        'Fill_X', 'Fill_Y',
+        'Fill_Hue', 'Fill_Saturation', 'Fill_Brightness');
+    colorMode(HSB)
     // give it an orthographic projection
-    cam.ortho(-width / 2, width / 2, height / 2, -height / 2, 0, 500);
+    ortho(-width / 2, width / 2, -height / 2, height / 2, -width, width);
+    camera(200, -200, 200, 0, 0, 0, 0, 1, 0);
+    noLoop();
+
 }
 
 function draw() {
-    //orbitControl();
     background(255);
-    lights();
-    ortho();
-    //rotateX(-PI/8);
-    rotateY(millis()/1000);
-    box(300,20,300);
-    translate(0,-30,0);
-    cylinder(20,40);
-    debugMode();
-}
+    lightFalloff(0.75, 0, 0);
 
-function setEnvironment() {
-   
+    pointLight(color(Key_Hue, Key_Saturation, Key_Brightness), 0, -Key_Y, Key_Z);
+    pointLight(color(Fill_Hue, Fill_Saturation, Fill_Brightness), Fill_X, -Fill_Y, 0);
+    push();
+    translate(0, -Key_Y, Key_Z);
+    noStroke();
+    emissiveMaterial(color(Key_Hue, Key_Saturation, Key_Brightness));
+    sphere(10);
+    pop();
+    push();
+    translate(Fill_X, -Fill_Y, 0);
+    noStroke();
+    emissiveMaterial(color(Fill_Hue, Fill_Saturation, Fill_Brightness));
+    sphere(10);
+    pop();
+
+    box(500, 20, 500);
+    translate(boxX, -boxSize, boxZ);
+    box(boxSize);
 }
