@@ -22,7 +22,7 @@ var Fill_YMax = 500;
 function setup() {
 
     setAttributes('antialias', true);
-    createCanvas(1600, 900, WEBGL);
+    createCanvas(windowWidth, windowHeight, WEBGL);
     gui = createGui('Lighting');
 
     gui.addGlobals('Key_Y', 'Key_Z',
